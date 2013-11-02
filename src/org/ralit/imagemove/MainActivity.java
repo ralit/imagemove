@@ -103,7 +103,6 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		image.setAlpha(1f);
 		image2 = new ImageView(this);
 		image2.setAlpha(0f);
-		image2.setImageResource(R.drawable.recognizing);
 		overview = new ImageView(this);
 		
 		framelayout = new FrameLayout(this);
@@ -121,6 +120,13 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		super.onWindowFocusChanged(hasFocus);
 		if (focusChanged) { return; }
 		
+		firstAnimation();
+		
+		focusChanged = true;
+	}
+	
+	private void firstAnimation() {
+		image2.setImageResource(R.drawable.recognizing);
 		AnimatorSet set = new AnimatorSet();
 		fadein = ObjectAnimator.ofFloat(image2, "alpha", 0f, 1f);
 		fadeout = ObjectAnimator.ofFloat(image, "alpha", 1f, 0f);
@@ -129,8 +135,6 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		set.play(fadein).with(fadeout);
 		set.start();
 		set.addListener(this);
-		
-		focusChanged = true;
 	}
 	
 	public void run() {
