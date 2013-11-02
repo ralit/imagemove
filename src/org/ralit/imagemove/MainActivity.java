@@ -84,21 +84,17 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
-
-		
-		lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-		linearlayout = new LinearLayout(this);
-		linearlayout.setLayoutParams(lp);
-		linearlayout.setOrientation(1); // vertical
-		setContentView(linearlayout);
-		
 		initView();
-		
+		setContentView(linearlayout);
 	}
 	
 	public void initView() {
 		Log.i("aaa", "initView()");
-
+		lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		linearlayout = new LinearLayout(this);
+		linearlayout.setLayoutParams(lp);
+		linearlayout.setOrientation(1); // vertical
+		
 		image = new ImageView(this);
 		image.setAlpha(1f);
 		image2 = new ImageView(this);
