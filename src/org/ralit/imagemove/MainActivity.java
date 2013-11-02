@@ -90,7 +90,9 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	
 	public void initView() {
 		Log.i("aaa", "initView()");
-		lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		int width;
+		int height;
+		lp = new LayoutParams(width = LayoutParams.MATCH_PARENT, height = LayoutParams.MATCH_PARENT);
 		linearlayout = new LinearLayout(this);
 		linearlayout.setLayoutParams(lp);
 		linearlayout.setOrientation(1); // vertical
@@ -103,6 +105,9 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		
 		framelayout = new FrameLayout(this);
 		framelayout2 = new FrameLayout(this);
+		lp2 = new LayoutParams(width, height/2);
+		framelayout2.setLayoutParams(lp2);
+		framelayout.setLayoutParams(lp2);
 		framelayout.addView(image);
 		framelayout.addView(image2);
 		framelayout2.addView(overview);
@@ -324,12 +329,7 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	public void onAnimationEnd(Animator animation) {
 		if (first == true) {
 			Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
-			lp2 = new LayoutParams(linearlayout.getWidth(), linearlayout.getHeight() / 2);
 
-			
-			framelayout2.setLayoutParams(lp2);
-			
-			framelayout.setLayoutParams(lp2);
 			
 			recognize();
 			Log.i("aaa", "recognize()");
