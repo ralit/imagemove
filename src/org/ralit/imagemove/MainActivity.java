@@ -99,9 +99,9 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		Log.i("aaa", "initView()");
 
 		image = new ImageView(this);
-		image.setAlpha(0f);
+		image.setAlpha(1f);
 		image2 = new ImageView(this);
-		image2.setAlpha(1f);
+		image2.setAlpha(0f);
 		image2.setImageResource(R.drawable.recognizing);
 		overview = new ImageView(this);
 		
@@ -120,41 +120,15 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		super.onWindowFocusChanged(hasFocus);
 		if (focusChanged) { return; }
 		
+		AnimatorSet set = new AnimatorSet();
+		fadein = ObjectAnimator.ofFloat(image2, "alpha", 0f, 1f);
+		fadeout = ObjectAnimator.ofFloat(image, "alpha", 1f, 0f);
+		fadein.setDuration(1000);
+		fadeout.setDuration(1000);
+		set.play(fadein).with(fadeout);
+		set.start();
+		set.addListener(this);
 		
-		Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
-		lp2 = new LayoutParams(linearlayout.getWidth(), linearlayout.getHeight() / 2);
-
-		
-		framelayout2.setLayoutParams(lp2);
-		
-		framelayout.setLayoutParams(lp2);
-		
-		recognize();
-		Log.i("aaa", "recognize()");
-		setPosition();
-		Log.i("aaa", "setPosition()");
-//		printPosition();
-		Collections.sort(pos, new PositionComparator());
-		Log.i("aaa", "sort()");
-//		printPosition();
-		paintPosition();
-		Log.i("aaa", "paintPosition()");
-		savePaintedImage();
-		Log.i("aaa", "savePaintedImage()");
-		setimage();
-//		if (index % 2 == 0) { select = image; } else { select = image2; }
-//		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
-//		prepare_image();
-//		select.setScaleX(textZoom);
-//		select.setScaleY(textZoom);
-//		Log.i("setimage()#textZoom", Float.toString(textZoom));
-//		select.setX(dW * textZoom / (float)2);
-//		select.setY(0);
-		Log.i("aaa", "setimage()");
-		setimage2();
-		Log.i("aaa", "setimage2()");
-		animation();
-		Log.i("aaa", "animation()");
 		focusChanged = true;
 	}
 	
@@ -347,6 +321,43 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 
 	@Override
 	public void onAnimationEnd(Animator animation) {
+		
+
+		Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
+		lp2 = new LayoutParams(linearlayout.getWidth(), linearlayout.getHeight() / 2);
+
+		
+		framelayout2.setLayoutParams(lp2);
+		
+		framelayout.setLayoutParams(lp2);
+		
+		recognize();
+		Log.i("aaa", "recognize()");
+		setPosition();
+		Log.i("aaa", "setPosition()");
+//		printPosition();
+		Collections.sort(pos, new PositionComparator());
+		Log.i("aaa", "sort()");
+//		printPosition();
+		paintPosition();
+		Log.i("aaa", "paintPosition()");
+		savePaintedImage();
+		Log.i("aaa", "savePaintedImage()");
+		setimage();
+//		if (index % 2 == 0) { select = image; } else { select = image2; }
+//		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
+//		prepare_image();
+//		select.setScaleX(textZoom);
+//		select.setScaleY(textZoom);
+//		Log.i("setimage()#textZoom", Float.toString(textZoom));
+//		select.setX(dW * textZoom / (float)2);
+//		select.setY(0);
+		Log.i("aaa", "setimage()");
+		setimage2();
+		Log.i("aaa", "setimage2()");
+		animation();
+		Log.i("aaa", "animation()");
+		
 		++index;
 		Log.i("aaa", "index: " + index);
 		if (index < pos.size()) {
