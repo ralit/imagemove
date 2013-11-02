@@ -58,6 +58,7 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	private float dW;
 	private float textZoom;
 	private boolean focusChanged = false; 
+	private boolean first = true;
 	private float cH;
 	private float cW;
 	private Bitmap bmp;
@@ -321,48 +322,49 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 
 	@Override
 	public void onAnimationEnd(Animator animation) {
-		
+		if (first == true) {
+			Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
+			lp2 = new LayoutParams(linearlayout.getWidth(), linearlayout.getHeight() / 2);
 
-		Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
-		lp2 = new LayoutParams(linearlayout.getWidth(), linearlayout.getHeight() / 2);
-
-		
-		framelayout2.setLayoutParams(lp2);
-		
-		framelayout.setLayoutParams(lp2);
-		
-		recognize();
-		Log.i("aaa", "recognize()");
-		setPosition();
-		Log.i("aaa", "setPosition()");
-//		printPosition();
-		Collections.sort(pos, new PositionComparator());
-		Log.i("aaa", "sort()");
-//		printPosition();
-		paintPosition();
-		Log.i("aaa", "paintPosition()");
-		savePaintedImage();
-		Log.i("aaa", "savePaintedImage()");
-		setimage();
-//		if (index % 2 == 0) { select = image; } else { select = image2; }
-//		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
-//		prepare_image();
-//		select.setScaleX(textZoom);
-//		select.setScaleY(textZoom);
-//		Log.i("setimage()#textZoom", Float.toString(textZoom));
-//		select.setX(dW * textZoom / (float)2);
-//		select.setY(0);
-		Log.i("aaa", "setimage()");
-		setimage2();
-		Log.i("aaa", "setimage2()");
-		animation();
-		Log.i("aaa", "animation()");
-		
-		++index;
-		Log.i("aaa", "index: " + index);
-		if (index < pos.size()) {
+			
+			framelayout2.setLayoutParams(lp2);
+			
+			framelayout.setLayoutParams(lp2);
+			
+			recognize();
+			Log.i("aaa", "recognize()");
+			setPosition();
+			Log.i("aaa", "setPosition()");
+//			printPosition();
+			Collections.sort(pos, new PositionComparator());
+			Log.i("aaa", "sort()");
+//			printPosition();
+			paintPosition();
+			Log.i("aaa", "paintPosition()");
+			savePaintedImage();
+			Log.i("aaa", "savePaintedImage()");
 			setimage();
-			animation();	
+//			if (index % 2 == 0) { select = image; } else { select = image2; }
+//			select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
+//			prepare_image();
+//			select.setScaleX(textZoom);
+//			select.setScaleY(textZoom);
+//			Log.i("setimage()#textZoom", Float.toString(textZoom));
+//			select.setX(dW * textZoom / (float)2);
+//			select.setY(0);
+			Log.i("aaa", "setimage()");
+			setimage2();
+			Log.i("aaa", "setimage2()");
+			animation();
+			Log.i("aaa", "animation()");
+			first = false;
+		} else {
+			++index;
+			Log.i("aaa", "index: " + index);
+			if (index < pos.size()) {
+				setimage();
+				animation();	
+			}
 		}
 	}
 }
