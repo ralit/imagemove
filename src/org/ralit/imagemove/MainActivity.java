@@ -42,19 +42,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-public class MainActivity extends Activity implements Runnable, AnimatorListener{
+public class MainActivity extends Activity implements AnimatorListener{
 	
 	private LayoutParams lp2;
 	private LayoutParams lp;
 	private LinearLayout linearlayout;
 	private FrameLayout framelayout2;
 	private FrameLayout framelayout;
+	private FrameLayout rootframe;
 	private int lw;
 	private int lh;
 	private ImageView image;
 	private ImageView image2;
 	private ImageView select;
 	private ImageView overview;
+	private ImageView nowloadingview;
 	private BitmapFactory.Options options;
 	private float dH;
 	private float dW;
@@ -71,6 +73,7 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	ObjectAnimator fadein;
 	ObjectAnimator fadeout;
 	ObjectAnimator move;
+	private String tag = "ralit";
 	
 	private String RECOGNITION_URL = "https://recognize.jp/v1/scenery/api/line-region";
 	private String API_KEY = "kU10DrMKI3xRnv4RVcxqbR1slGwrfTCsSKoc9A378s";
@@ -81,58 +84,93 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.i("aaa", "onCreate()");
+		Log.i(tag, "onCreate()");
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
-		
-		initView();
-		setContentView(linearlayout);
+		initRootView();
 	}
 	
-	public void initView() {
-		Log.i("aaa", "initView()");
-		lp = new LayoutParams(lw = LayoutParams.MATCH_PARENT, lh = LayoutParams.MATCH_PARENT);
-		linearlayout = new LinearLayout(this);
-		linearlayout.setLayoutParams(lp);
-		linearlayout.setOrientation(1); // vertical
-		
-
-		
-	}	
-	
+	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		Log.i("aaa", "onWindowFocusChanged()");
+		Log.i(tag, "onWindowFocusChanged()");
 		super.onWindowFocusChanged(hasFocus);
 		if (focusChanged) { return; }
-		
-//		firstAnimation();
-		fuckingAnimation();
+		initChildrenView();
+		fadeinNowloading();
 		focusChanged = true;
 	}
-	
-	public void fuckingAnimation() {
-		linearlayout.animate().alpha(1f).setDuration(1000).setListener(this);
+
+	@Override
+	public void onAnimationEnd(Animator animation) {
+		if (first == true) {
+			recognize();
+			setPosition();
+			Collections.sort(pos, new PositionComparator());
+			paintPosition();
+			savePaintedImage();
+			setimage();
+			setimage2();
+			fadeoutNowloading();
+			animation();
+			first = false;
+			return;
+		} else {
+			++index;
+			Log.i(tag, "index: " + index);
+			if (index < pos.size()) {
+				setimage();
+				animation();	
+			}
+			return;
+		}
 	}
 	
-	private void firstAnimation() {
-		image2.setImageResource(R.drawable.recognizing);
-		AnimatorSet set = new AnimatorSet();
-		fadein = ObjectAnimator.ofFloat(image2, "alpha", 0f, 1f);
-		fadeout = ObjectAnimator.ofFloat(image, "alpha", 1f, 0f);
-		fadein.setDuration(1000);
-		fadeout.setDuration(1000);
-		set.play(fadein).with(fadeout);
-		set.start();
-		set.addListener(this);
-	}
+	public void initRootView() {
+		Log.i(tag, "initRootView()");
+		rootframe = new FrameLayout(this);
+		nowloadingview = new ImageView(this);
+		nowloadingview.setAlpha(0f);
+		rootframe.addView(nowloadingview);
+		setContentView(rootframe);
+	}	
 	
-	public void run() {
+
+	private void initChildrenView() {
+		Log.i(tag, "initChildrenView()");
+		Log.i(tag, "rootframe" + rootframe.getHeight() + rootframe.getWidth());
+		linearlayout = new LinearLayout(this);
+		linearlayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		linearlayout.setOrientation(1); // vertical
+		rootframe.addView(linearlayout);
 		
+		framelayout = new FrameLayout(this);
+		framelayout.setLayoutParams(new LayoutParams(rootframe.getWidth(), rootframe.getHeight() / 2));
+		framelayout2 = new FrameLayout(this);
+		framelayout2.setLayoutParams(new LayoutParams(rootframe.getWidth(), rootframe.getHeight() / 2));
+		linearlayout.addView(framelayout);
+		linearlayout.addView(framelayout2);
+		
+		image = new ImageView(this);
+		image2 = new ImageView(this);
+		image2.setAlpha(0f);
+		overview = new ImageView(this);
+		framelayout.addView(image);
+		framelayout.addView(image2);
+		framelayout2.addView(overview);
+	}
+	
+	public void fadeinNowloading() {
+		nowloadingview.setImageResource(R.drawable.recognizing);
+		nowloadingview.animate().alpha(1f).setDuration(1000).setListener(this);
+	}
+	
+	public void fadeoutNowloading() {
+		nowloadingview.animate().alpha(0f).setDuration(1000);
 	}
 	
 	private void animation() {
+		Log.i(tag, "animation()");
 		AnimatorSet set = new AnimatorSet();
 		if(index % 2 == 0) {
 			fadein = ObjectAnimator.ofFloat(image, "alpha", 0f, 1f);
@@ -148,11 +186,13 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		move.setInterpolator(new LinearInterpolator());
 		set.play(fadein).with(fadeout);
 		set.play(fadein).before(move);
-		set.start();
 		set.addListener(this);
+		set.start();
+		
 	}
 	
 	private void prepare_image() {
+		Log.i(tag, "prepare_image()");
 		dH = (float) framelayout.getHeight();
 		dW = (float) framelayout.getWidth();
 		cW = (pos.get(index).get(2) - pos.get(index).get(0));
@@ -166,38 +206,40 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	}
 	
 	public void setimage() {
+		Log.i(tag, "setimage()");
 		if (index % 2 == 0) { select = image; } else { select = image2; }
 		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
 		prepare_image();
 		select.setScaleX(textZoom);
 		select.setScaleY(textZoom);
-		Log.i("setimage()#textZoom", Float.toString(textZoom));
 		select.setX(dW * textZoom / (float)2);
 		select.setY(0);
 	}
 	
 	private void setimage2() {
+		Log.i(tag, "setimage2()");
 		overview.setImageBitmap(mutableBitmap);
-//		float w = (float) mutableBitmap.getWidth();
-//		float h = (float) mutableBitmap.getHeight();
-//		float ratio = dH / h;
-//		float small_w = w * ratio;
-//		float scale_ratio = dW / small_w;
-//		Log.i("w", Float.toString(w));
-//		Log.i("h", Float.toString(h));
-//		Log.i("ratio", Float.toString(ratio));
-//		Log.i("small_w", Float.toString(small_w));
-//		Log.i("scale_ratio", Float.toString(scale_ratio));
-		float H = (float) linearlayout.getWidth();
-		Log.i("aaa", "linearlayout.getWidth(): " + H);
-		float h = (float) overview.getWidth();
-		Log.i("aaa", "overview.getWidth(): " + h);
-		float scale_ratio = H / h;
+		float w = (float) mutableBitmap.getWidth();
+		float h = (float) mutableBitmap.getHeight();
+		float ratio = dH / h;
+		float small_w = w * ratio;
+		float scale_ratio = dW / small_w;
+		Log.i("w", Float.toString(w));
+		Log.i("h", Float.toString(h));
+		Log.i("ratio", Float.toString(ratio));
+		Log.i("small_w", Float.toString(small_w));
+		Log.i("scale_ratio", Float.toString(scale_ratio));
+//		float H = (float) linearlayout.getWidth();
+//		Log.i(tag, "linearlayout.getWidth(): " + H);
+//		float h = (float) overview.getWidth();
+//		Log.i(tag, "overview.getWidth(): " + h);
+//		float scale_ratio = H / h;
 		overview.setScaleX(scale_ratio);
 		overview.setScaleY(scale_ratio);
 	}
 	
 	private void recognize() {
+		Log.i(tag, "recognize()");
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -236,6 +278,7 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	}
 
 	private void setPosition() {
+		Log.i(tag, "setPosition()");
 		for (LineLayout line : job) {
 			Rectangle bounds = line.getShape().getBounds();
 			ArrayList<Integer> internal = new ArrayList<Integer>();
@@ -250,6 +293,7 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	}
 	
 	private void paintPosition() {
+		Log.i(tag, "paintPosition()");
 		frame = new Paint();
 		frame.setStyle(Style.STROKE);
 		frame.setColor(Color.RED);
@@ -275,8 +319,9 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	}
 	
 	private void savePaintedImage() {
+		Log.i(tag, "savePaintedImage()");
 		// ファイルの保存
-		Log.i("aaa", Environment.getExternalStorageDirectory().getPath());
+		Log.i(tag, Environment.getExternalStorageDirectory().getPath());
 		File file = new File(Environment.getExternalStorageDirectory().getPath() + "/imagemove/");
 		try {
 			if (!file.exists()) { file.mkdir(); }
@@ -313,67 +358,6 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	public void onAnimationStart(Animator animation) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void onAnimationEnd(Animator animation) {
-		if (first == true) {
-			image = new ImageView(this);
-			image.setAlpha(1f);
-			image2 = new ImageView(this);
-			image2.setAlpha(0f);
-			overview = new ImageView(this);
-			
-			framelayout = new FrameLayout(this);
-			framelayout2 = new FrameLayout(this);
-			lp2 = new LayoutParams(lw, lh/2);
-			framelayout2.setLayoutParams(lp2);
-			framelayout.setLayoutParams(lp2);
-			framelayout.addView(image);
-			framelayout.addView(image2);
-			framelayout2.addView(overview);
-			linearlayout.addView(framelayout);
-			linearlayout.addView(framelayout2);
-			firstAnimation();
-			
-			Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
-
-			
-			recognize();
-			Log.i("aaa", "recognize()");
-			setPosition();
-			Log.i("aaa", "setPosition()");
-//			printPosition();
-			Collections.sort(pos, new PositionComparator());
-			Log.i("aaa", "sort()");
-//			printPosition();
-			paintPosition();
-			Log.i("aaa", "paintPosition()");
-			savePaintedImage();
-			Log.i("aaa", "savePaintedImage()");
-			setimage();
-//			if (index % 2 == 0) { select = image; } else { select = image2; }
-//			select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
-//			prepare_image();
-//			select.setScaleX(textZoom);
-//			select.setScaleY(textZoom);
-//			Log.i("setimage()#textZoom", Float.toString(textZoom));
-//			select.setX(dW * textZoom / (float)2);
-//			select.setY(0);
-			Log.i("aaa", "setimage()");
-			setimage2();
-			Log.i("aaa", "setimage2()");
-			animation();
-			Log.i("aaa", "animation()");
-			first = false;
-		} else {
-			++index;
-			Log.i("aaa", "index: " + index);
-			if (index < pos.size()) {
-				setimage();
-				animation();	
-			}
-		}
 	}
 }
 
