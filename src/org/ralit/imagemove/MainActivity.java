@@ -34,6 +34,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
@@ -84,8 +85,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 		Log.i(tag, "onCreate()");
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		initRootView();
+		rootframe.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		nowloadingview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 	
 	@Override
@@ -95,6 +99,12 @@ public class MainActivity extends Activity implements AnimatorListener{
 		if (focusChanged) { return; }
 		focusChanged = true;
 		initChildrenView();
+		linearlayout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		framelayout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		framelayout2.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		image.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		image2.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+		overview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		fadeinNowloading();
 	}
 
@@ -112,6 +122,13 @@ public class MainActivity extends Activity implements AnimatorListener{
 			setimage2();
 			fadeoutNowloading();
 			animation();
+			Log.i(tag, "image" + image.isHardwareAccelerated());
+			Log.i(tag, "framelayout" + framelayout.isHardwareAccelerated());
+			Log.i(tag, "rootframe" + rootframe.isHardwareAccelerated());
+			Log.i(tag, "image" + image.getLayerType());
+			Log.i(tag, "framelayout" + framelayout.getLayerType());
+			Log.i(tag, "rootframe" + rootframe.getLayerType());
+			
 		} else {
 			++index;
 			Log.i(tag, "index: " + index);
@@ -237,16 +254,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 		float scale_ratio = dW / small_w;
 		page = Bitmap.createScaledBitmap(mutableBitmap, (int)dW, (int)(dW * (h/w)), false);
 		overview.setImageBitmap(page);
-//		Log.i("w", Float.toString(w));
-//		Log.i("h", Float.toString(h));
-//		Log.i("ratio", Float.toString(ratio));
-//		Log.i("small_w", Float.toString(small_w));
-//		Log.i("scale_ratio", Float.toString(scale_ratio));
-//		float H = (float) linearlayout.getWidth();
-//		Log.i(tag, "linearlayout.getWidth(): " + H);
-//		float h = (float) overview.getWidth();
-//		Log.i(tag, "overview.getWidth(): " + h);
-//		float scale_ratio = H / h;
+
 		overview.setScaleX(scale_ratio);
 		overview.setScaleY(scale_ratio);
 		float linemid = (pos.get(index).get(3) + pos.get(index).get(1)) / 2;
@@ -301,7 +309,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 		for (LineLayout line : job) {
 			Rectangle bounds = line.getShape().getBounds();
 			ArrayList<Integer> internal = new ArrayList<Integer>();
-			float marginRatio = 0.1f;
+			float marginRatio = 0.2f;
 			float margin = (bounds.getBottom() - bounds.getTop()) * marginRatio;
 			internal.add(bounds.getLeft() - (int)margin);
 			internal.add(bounds.getTop() - (int)margin);
