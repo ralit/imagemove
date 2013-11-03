@@ -44,14 +44,10 @@ import android.widget.LinearLayout.LayoutParams;
 
 public class MainActivity extends Activity implements AnimatorListener{
 	
-	private LayoutParams lp2;
-	private LayoutParams lp;
 	private LinearLayout linearlayout;
 	private FrameLayout framelayout2;
 	private FrameLayout framelayout;
 	private FrameLayout rootframe;
-	private int lw;
-	private int lh;
 	private ImageView image;
 	private ImageView image2;
 	private ImageView select;
@@ -115,7 +111,6 @@ public class MainActivity extends Activity implements AnimatorListener{
 			setimage2();
 			fadeoutNowloading();
 			animation();
-			return;
 		} else {
 			++index;
 			Log.i(tag, "index: " + index);
@@ -124,7 +119,6 @@ public class MainActivity extends Activity implements AnimatorListener{
 				animation2();
 				animation();	
 			}
-			return;
 		}
 	}
 	
