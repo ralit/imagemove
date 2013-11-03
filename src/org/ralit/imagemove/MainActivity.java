@@ -85,11 +85,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 		Log.i(tag, "onCreate()");
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+//		getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		initRootView();
-		rootframe.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		nowloadingview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+//		rootframe.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		nowloadingview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 	}
 	
 	@Override
@@ -99,12 +99,12 @@ public class MainActivity extends Activity implements AnimatorListener{
 		if (focusChanged) { return; }
 		focusChanged = true;
 		initChildrenView();
-		linearlayout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		framelayout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		framelayout2.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		image.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		image2.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-		overview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+//		linearlayout.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		framelayout.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		framelayout2.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		image.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		image2.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//		overview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		fadeinNowloading();
 	}
 
@@ -237,7 +237,10 @@ public class MainActivity extends Activity implements AnimatorListener{
 	public void setimage() {
 		Log.i(tag, "setimage()");
 		if (index % 2 == 0) { select = image; } else { select = image2; }
-		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
+		int w;
+		int h;
+		select.setImageBitmap(Bitmap.createScaledBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), w = pos.get(index).get(2) - pos.get(index).get(0), h = pos.get(index).get(3) - pos.get(index).get(1)), 1024, 1024 * (h/w), false));
+//		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
 		prepare_image();
 		select.setScaleX(textZoom);
 		select.setScaleY(textZoom);
