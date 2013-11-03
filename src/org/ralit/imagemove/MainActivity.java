@@ -299,13 +299,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 		for (LineLayout line : job) {
 			Rectangle bounds = line.getShape().getBounds();
 			ArrayList<Integer> internal = new ArrayList<Integer>();
-			if (bounds.getRight() <= bmp.getWidth() && bounds.getBottom() <= bmp.getHeight()) {
-				internal.add(bounds.getLeft());
-				internal.add(bounds.getTop());
-				internal.add(bounds.getRight());
-				internal.add(bounds.getBottom());
-				pos.add(internal);	
-			}
+			internal.add(bounds.getLeft());
+			internal.add(bounds.getTop());
+			internal.add(bounds.getRight());
+			internal.add(bounds.getBottom());
+			pos.add(internal);	
 		}
 	}
 	
