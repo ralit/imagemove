@@ -34,6 +34,9 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -72,6 +75,8 @@ public class MainActivity extends Activity implements AnimatorListener{
 	ObjectAnimator fadeout;
 	ObjectAnimator move;
 	private String tag = "ralit";
+	private GestureDetector gesture;
+	AnimatorSet set;
 	
 	private String RECOGNITION_URL = "https://recognize.jp/v1/scenery/api/line-region";
 	private String API_KEY = "kU10DrMKI3xRnv4RVcxqbR1slGwrfTCsSKoc9A378s";
@@ -121,6 +126,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 			setimage();
 			setimage2();
 			fadeoutNowloading();
+			gesture = new GestureDetector(this, gestureListener);
 			animation();
 			Log.i(tag, "image" + image.isHardwareAccelerated());
 			Log.i(tag, "framelayout" + framelayout.isHardwareAccelerated());
@@ -139,6 +145,26 @@ public class MainActivity extends Activity implements AnimatorListener{
 			}
 		}
 	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return gesture.onTouchEvent(ev);
+	}
+	
+	private final SimpleOnGestureListener gestureListener = new SimpleOnGestureListener() {
+		@Override
+		public boolean onFling(MotionEvent ev1, MotionEvent ev2, float vx, float vy) {
+				if (Math.abs(ev1.getY() - ev2.getY()) > 250) { return false; }
+				if (ev2.getX() - ev1.getX() > 120 && Math.abs(vx) > 200) {
+					--index;
+					set.cancel();
+					setimage();
+					animation2();
+					animation();
+				}
+			return false;
+		}
+	};
 	
 	public void initRootView() {
 		Log.i(tag, "initRootView()");
@@ -190,7 +216,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 	
 	public void animation() {
 		Log.i(tag, "animation()");
-		AnimatorSet set = new AnimatorSet();
+		set = new AnimatorSet();
 		if(index % 2 == 0) {
 			fadein = ObjectAnimator.ofFloat(image, "alpha", 0f, 1f);
 			fadeout = ObjectAnimator.ofFloat(image2, "alpha", 1f, 0f);
@@ -206,7 +232,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 		move.addListener(this);
 		set.play(fadein).with(fadeout);
 		set.play(fadein).before(move);
-		set.start();	
+		set.start();
 	}
 	
 	private void animation2() {
@@ -237,10 +263,10 @@ public class MainActivity extends Activity implements AnimatorListener{
 	public void setimage() {
 		Log.i(tag, "setimage()");
 		if (index % 2 == 0) { select = image; } else { select = image2; }
-		int w;
-		int h;
-		select.setImageBitmap(Bitmap.createScaledBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), w = pos.get(index).get(2) - pos.get(index).get(0), h = pos.get(index).get(3) - pos.get(index).get(1)), 1024, 1024 * (h/w), false));
-//		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), pos.get(index).get(2) - pos.get(index).get(0), pos.get(index).get(3) - pos.get(index).get(1)));
+		int w = pos.get(index).get(2) - pos.get(index).get(0);
+		int h = pos.get(index).get(3) - pos.get(index).get(1);
+//		select.setImageBitmap(Bitmap.createScaledBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), w, h), 2048, (int)(2048 * ((float)h/(float)w)), false));
+		select.setImageBitmap(Bitmap.createBitmap(bmp, pos.get(index).get(0), pos.get(index).get(1), w, h));
 		prepare_image();
 		select.setScaleX(textZoom);
 		select.setScaleY(textZoom);
