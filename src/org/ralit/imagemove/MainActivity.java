@@ -49,6 +49,8 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	private LinearLayout linearlayout;
 	private FrameLayout framelayout2;
 	private FrameLayout framelayout;
+	private int lw;
+	private int lh;
 	private ImageView image;
 	private ImageView image2;
 	private ImageView select;
@@ -84,35 +86,19 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
+		
 		initView();
 		setContentView(linearlayout);
 	}
 	
 	public void initView() {
 		Log.i("aaa", "initView()");
-		int width;
-		int height;
-		lp = new LayoutParams(width = LayoutParams.MATCH_PARENT, height = LayoutParams.MATCH_PARENT);
+		lp = new LayoutParams(lw = LayoutParams.MATCH_PARENT, lh = LayoutParams.MATCH_PARENT);
 		linearlayout = new LinearLayout(this);
 		linearlayout.setLayoutParams(lp);
 		linearlayout.setOrientation(1); // vertical
 		
-		image = new ImageView(this);
-		image.setAlpha(1f);
-		image2 = new ImageView(this);
-		image2.setAlpha(0f);
-		overview = new ImageView(this);
-		
-		framelayout = new FrameLayout(this);
-		framelayout2 = new FrameLayout(this);
-		lp2 = new LayoutParams(width, height/2);
-		framelayout2.setLayoutParams(lp2);
-		framelayout.setLayoutParams(lp2);
-		framelayout.addView(image);
-		framelayout.addView(image2);
-		framelayout2.addView(overview);
-		linearlayout.addView(framelayout);
-		linearlayout.addView(framelayout2);
+
 		
 	}	
 	
@@ -121,9 +107,13 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 		super.onWindowFocusChanged(hasFocus);
 		if (focusChanged) { return; }
 		
-		firstAnimation();
-		
+//		firstAnimation();
+		fuckingAnimation();
 		focusChanged = true;
+	}
+	
+	public void fuckingAnimation() {
+		linearlayout.animate().alpha(1f).setDuration(1000).setListener(this);
 	}
 	
 	private void firstAnimation() {
@@ -328,6 +318,24 @@ public class MainActivity extends Activity implements Runnable, AnimatorListener
 	@Override
 	public void onAnimationEnd(Animator animation) {
 		if (first == true) {
+			image = new ImageView(this);
+			image.setAlpha(1f);
+			image2 = new ImageView(this);
+			image2.setAlpha(0f);
+			overview = new ImageView(this);
+			
+			framelayout = new FrameLayout(this);
+			framelayout2 = new FrameLayout(this);
+			lp2 = new LayoutParams(lw, lh/2);
+			framelayout2.setLayoutParams(lp2);
+			framelayout.setLayoutParams(lp2);
+			framelayout.addView(image);
+			framelayout.addView(image2);
+			framelayout2.addView(overview);
+			linearlayout.addView(framelayout);
+			linearlayout.addView(framelayout2);
+			firstAnimation();
+			
 			Log.i("aaa", "linearlayout: " + linearlayout.getWidth());
 
 			
