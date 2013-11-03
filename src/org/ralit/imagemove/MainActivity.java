@@ -62,10 +62,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 	private float cH;
 	private float cW;
 	private Bitmap bmp;
+	private Bitmap mutableBitmap;
+	private Bitmap page;
 	ArrayList<ArrayList<Integer>> pos = new ArrayList<ArrayList<Integer>>();
 	private Paint frame;
 	private Paint number;
-	private Bitmap mutableBitmap;
 	ObjectAnimator fadein;
 	ObjectAnimator fadeout;
 	ObjectAnimator move;
@@ -229,12 +230,13 @@ public class MainActivity extends Activity implements AnimatorListener{
 	
 	private void setimage2() {
 		Log.i(tag, "setimage2()");
-		overview.setImageBitmap(mutableBitmap);
 		float w = (float) mutableBitmap.getWidth();
 		float h = (float) mutableBitmap.getHeight();
 		float ratio = dH / h;
 		float small_w = w * ratio;
 		float scale_ratio = dW / small_w;
+		page = Bitmap.createScaledBitmap(mutableBitmap, (int)dW, (int)(dW * (h/w)), false);
+		overview.setImageBitmap(page);
 //		Log.i("w", Float.toString(w));
 //		Log.i("h", Float.toString(h));
 //		Log.i("ratio", Float.toString(ratio));
@@ -299,10 +301,12 @@ public class MainActivity extends Activity implements AnimatorListener{
 		for (LineLayout line : job) {
 			Rectangle bounds = line.getShape().getBounds();
 			ArrayList<Integer> internal = new ArrayList<Integer>();
-			internal.add(bounds.getLeft());
-			internal.add(bounds.getTop());
-			internal.add(bounds.getRight());
-			internal.add(bounds.getBottom());
+			float marginRatio = 0.1f;
+			float margin = (bounds.getBottom() - bounds.getTop()) * marginRatio;
+			internal.add(bounds.getLeft() - (int)margin);
+			internal.add(bounds.getTop() - (int)margin);
+			internal.add(bounds.getRight() + (int)margin);
+			internal.add(bounds.getBottom() + (int)margin);
 			pos.add(internal);	
 		}
 	}
