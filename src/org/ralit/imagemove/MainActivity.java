@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 			Log.i(tag, "index: " + index);
 			if (index < pos.size()) {
 				setimage();
-				setimage2();
+				animation2();
 				animation();	
 			}
 			return;
@@ -198,7 +198,14 @@ public class MainActivity extends Activity implements AnimatorListener{
 	}
 	
 	private void animation2() {
-		
+		float h = mutableBitmap.getHeight();
+		float w = mutableBitmap.getWidth();
+		float linemid = (pos.get(index).get(3) + pos.get(index).get(1)) / 2;
+		float distance = h / 2 - linemid;
+		float i = distance * (overview.getWidth() / w);
+		ObjectAnimator anim = ObjectAnimator.ofFloat(overview, "y", i);
+		anim.setDuration(1000);
+		anim.start();
 	}
 	
 	private void prepare_image() {
