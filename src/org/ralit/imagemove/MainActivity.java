@@ -96,14 +96,16 @@ public class MainActivity extends Activity implements AnimatorListener{
 		Log.i(tag, "onWindowFocusChanged()");
 		super.onWindowFocusChanged(hasFocus);
 		if (focusChanged) { return; }
+		focusChanged = true;
 		initChildrenView();
 		fadeinNowloading();
-		focusChanged = true;
 	}
 
 	@Override
 	public void onAnimationEnd(Animator animation) {
-		if (first == true) {
+		Log.i(tag, "onAnimationEnd()");
+		if (first) {
+			first = false;
 			recognize();
 			setPosition();
 			Collections.sort(pos, new PositionComparator());
@@ -113,13 +115,13 @@ public class MainActivity extends Activity implements AnimatorListener{
 			setimage2();
 			fadeoutNowloading();
 			animation();
-			first = false;
 			return;
 		} else {
 			++index;
 			Log.i(tag, "index: " + index);
 			if (index < pos.size()) {
 				setimage();
+				setimage2();
 				animation();	
 			}
 			return;
@@ -161,15 +163,20 @@ public class MainActivity extends Activity implements AnimatorListener{
 	}
 	
 	public void fadeinNowloading() {
+		Log.i(tag, "fadeinNowloading()");
 		nowloadingview.setImageResource(R.drawable.recognizing);
-		nowloadingview.animate().alpha(1f).setDuration(1000).setListener(this);
+		ObjectAnimator anim = ObjectAnimator.ofFloat(nowloadingview, "alpha", 1f);
+		anim.setDuration(1000);
+		anim.addListener(this);
+		anim.start();
 	}
 	
 	public void fadeoutNowloading() {
+		Log.i(tag, "fadeoutNowloading()");
 		nowloadingview.animate().alpha(0f).setDuration(1000);
 	}
 	
-	private void animation() {
+	public void animation() {
 		Log.i(tag, "animation()");
 		AnimatorSet set = new AnimatorSet();
 		if(index % 2 == 0) {
@@ -179,15 +186,18 @@ public class MainActivity extends Activity implements AnimatorListener{
 			fadein = ObjectAnimator.ofFloat(image2, "alpha", 0f, 1f);
 			fadeout = ObjectAnimator.ofFloat(image, "alpha", 1f, 0f);
 		}
-		fadein.setDuration(3000);
-		fadeout.setDuration(3000);
+		fadein.setDuration(1000);
+		fadeout.setDuration(1000);
 		move = ObjectAnimator.ofFloat(select, "x", dW * textZoom / (float)2, -dW * textZoom / (float)2);
 		move.setDuration(15000);
 		move.setInterpolator(new LinearInterpolator());
+		move.addListener(this);
 		set.play(fadein).with(fadeout);
 		set.play(fadein).before(move);
-		set.addListener(this);
-		set.start();
+		set.start();	
+	}
+	
+	private void animation2() {
 		
 	}
 	
@@ -224,11 +234,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 		float ratio = dH / h;
 		float small_w = w * ratio;
 		float scale_ratio = dW / small_w;
-		Log.i("w", Float.toString(w));
-		Log.i("h", Float.toString(h));
-		Log.i("ratio", Float.toString(ratio));
-		Log.i("small_w", Float.toString(small_w));
-		Log.i("scale_ratio", Float.toString(scale_ratio));
+//		Log.i("w", Float.toString(w));
+//		Log.i("h", Float.toString(h));
+//		Log.i("ratio", Float.toString(ratio));
+//		Log.i("small_w", Float.toString(small_w));
+//		Log.i("scale_ratio", Float.toString(scale_ratio));
 //		float H = (float) linearlayout.getWidth();
 //		Log.i(tag, "linearlayout.getWidth(): " + H);
 //		float h = (float) overview.getWidth();
@@ -236,6 +246,11 @@ public class MainActivity extends Activity implements AnimatorListener{
 //		float scale_ratio = H / h;
 		overview.setScaleX(scale_ratio);
 		overview.setScaleY(scale_ratio);
+		float linemid = (pos.get(index).get(3) + pos.get(index).get(1)) / 2;
+		float distance = h / 2 - linemid;
+		float i = distance * (overview.getWidth() / w);
+		overview.setY(i);
+		Log.i(tag, "i: " + i);
 	}
 	
 	private void recognize() {
@@ -256,6 +271,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 	}
 		
 	private void docomo () {
+		Log.i(tag, "docomo()");
 		options = new BitmapFactory.Options();
 		options.inScaled = false;
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.organic, options);
@@ -313,6 +329,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 	}
 	
 	private void printPosition() {
+		Log.i(tag, "printPosition()");
 		for (int i = 0; i < pos.size(); ++i) {
 			Log.i("pos", i + ": " + pos.get(i));
 		}
@@ -344,18 +361,21 @@ public class MainActivity extends Activity implements AnimatorListener{
 	
 	@Override
 	public void onAnimationCancel(Animator animation) {
+		Log.i(tag, "onAnimationCancel()");
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onAnimationRepeat(Animator animation) {
+		Log.i(tag, "onAnimationRepeat()");
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onAnimationStart(Animator animation) {
+		Log.i(tag, "onAnimationStart()");
 		// TODO Auto-generated method stub
 		
 	}
