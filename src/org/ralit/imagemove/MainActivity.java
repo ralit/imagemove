@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 	private float textZoom;
 	private boolean focusChanged = false; 
 	private boolean first = true;
+	private boolean back = false;
 	private float cH;
 	private float cW;
 	private Bitmap bmp;
@@ -121,6 +122,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 			recognize();
 			setPosition();
 			Collections.sort(pos, new PositionComparator());
+//			deleteDuplicate();
 			paintPosition();
 			savePaintedImage();
 			setimage();
@@ -136,7 +138,8 @@ public class MainActivity extends Activity implements AnimatorListener{
 			Log.i(tag, "rootframe" + rootframe.getLayerType());
 			
 		} else {
-			++index;
+			if (!back) { ++index; }
+			back = false;
 			Log.i(tag, "index: " + index);
 			if (index < pos.size()) {
 				setimage();
@@ -156,15 +159,33 @@ public class MainActivity extends Activity implements AnimatorListener{
 		public boolean onFling(MotionEvent ev1, MotionEvent ev2, float vx, float vy) {
 				if (Math.abs(ev1.getY() - ev2.getY()) > 250) { return false; }
 				if (ev2.getX() - ev1.getX() > 120 && Math.abs(vx) > 200) {
-					--index;
+					back = true;
+					if (set.getChildAnimations().get(0).isRunning()) { 
+						if (index > 0) { --index; }
+					}
 					set.cancel();
-					setimage();
-					animation2();
-					animation();
+				}
+				if (ev1.getX() - ev2.getX() > 120 && Math.abs(vx) > 200) {
+					set.cancel();
 				}
 			return false;
 		}
 	};
+	
+	private void deleteDuplicate() {
+		Log.i(tag, "deleteDuplicate()");
+		for (int i = 1; i < pos.size();) {
+			ArrayList<Integer> i0 = pos.get(i);
+			ArrayList<Integer> i1 = pos.get(i - 1);
+			if (i0.get(1) < i1.get(3)) {  
+				i1.set(0, i0.get(0) < i1.get(0) ? i0.get(0) : i1.get(0));
+				i1.set(2, i0.get(2) > i1.get(2) ? i0.get(2) : i1.get(2));
+				pos.remove(i);
+			} else {
+				++i;
+			}
+		}
+	}
 	
 	public void initRootView() {
 		Log.i(tag, "initRootView()");
@@ -229,9 +250,9 @@ public class MainActivity extends Activity implements AnimatorListener{
 		move = ObjectAnimator.ofFloat(select, "x", dW * textZoom / (float)2, -dW * textZoom / (float)2);
 		move.setDuration(15000);
 		move.setInterpolator(new LinearInterpolator());
-		move.addListener(this);
 		set.play(fadein).with(fadeout);
 		set.play(fadein).before(move);
+		set.addListener(this);
 		set.start();
 	}
 	
