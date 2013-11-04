@@ -122,7 +122,7 @@ public class MainActivity extends Activity implements AnimatorListener{
 			recognize();
 			setPosition();
 			Collections.sort(pos, new PositionComparator());
-//			deleteDuplicate();
+			deleteDuplicate();
 			paintPosition();
 			savePaintedImage();
 			setimage();
